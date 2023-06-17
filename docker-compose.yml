@@ -1,0 +1,80 @@
+version: '3'
+services:
+  node1:
+    image: opensearchproject/opensearch:latest
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=node1
+      - discovery.seed_hosts=node1,node2
+      - cluster.initial_cluster_manager_nodes=node1,node2
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1 # Set memlock to unlimited (no soft or hard limit)
+        hard: -1
+      nofile:
+        soft: 65536 # Maximum number of open files for the opensearch user - set to at least 65536
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+    ports:
+      - "9200:9200" # REST API
+      - '9600:9600'
+    networks:
+      - opensearch
+
+  node2:
+    image: opensearchproject/opensearch:latest
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=node2
+      - discovery.seed_hosts=node1,node2
+      - cluster.initial_cluster_manager_nodes=node1,node2
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data2:/usr/share/opensearch/data
+    networks:
+      - opensearch
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    ports:
+      - "5601:5601"
+    expose:
+      - "5601"
+    environment:
+      OPENSEARCH_HOSTS: '["https://node1:9200","https://node2:9200"]'
+    networks:
+      - opensearch
+
+  logstash:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.4
+    user: root
+    networks:
+      - opensearch
+    volumes:
+      - "./logstash_conf/movies.conf:/usr/share/logstash/pipeline/logstash.conf"
+      - "./cluster-ca-certificate.pem:/usr/share/logstash/cluster-ca-certificate.pem"
+      - "./ml-25m/:/usr/share/logstash/ml-25m/"
+      - "./sincedb/:/usr/data/:rw"
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+
+
+
+volumes:
+  opensearch-data1:
+  opensearch-data2:
+
+networks:
+  opensearch:
+    external: true
+ 
