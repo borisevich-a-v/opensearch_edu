@@ -1,5 +1,3 @@
-export logstashconf="movies.conf"
-
 .PHONY: prereq
 prereq:
 	@docker network create opensearch  || true
