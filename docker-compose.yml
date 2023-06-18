@@ -62,8 +62,7 @@ services:
     networks:
       - opensearch
     volumes:
-      - "./logstash_conf/genome-tags.conf:/usr/share/logstash/pipeline/logstash.conf"
-      - "./cluster-ca-certificate.pem:/usr/share/logstash/cluster-ca-certificate.pem"
+      - "./logstash_conf/tags.conf:/usr/share/logstash/pipeline/logstash.conf"
       - "./ml-25m/:/usr/share/logstash/ml-25m/"
       - "./sincedb/:/usr/data/:rw"
     command: logstash -f /usr/share/logstash/pipeline/logstash.conf
