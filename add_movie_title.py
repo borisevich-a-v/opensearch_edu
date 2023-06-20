@@ -41,7 +41,7 @@ def update_genome_score_by_tag(tag: Tag):
             }
         },
         "script": {
-            "source": f"ctx._source.tag_name = 'params.tag'",
+            "source": f"ctx._source.tag_name = params.tag",
             "params": {
                 "tag": tag.tag
             }
