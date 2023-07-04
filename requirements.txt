@@ -1,0 +1,4 @@
+opensearch-py
+python-dateutil
+requests
+six
