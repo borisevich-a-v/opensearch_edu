@@ -114,7 +114,7 @@ def create_movies_index(index_name):
                 "@version": {
                     "type": "text"
                 },
-                "genres": { # TODO list of objects
+                "genres": {
                     "type": "text",
                     "fields": {
                         "keyword": {
