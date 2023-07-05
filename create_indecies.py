@@ -3,6 +3,7 @@ from opensearchpy import OpenSearch, RequestError
 TAGS_INDEX_NAME = "tags"
 RATINGS_INDEX_NAME = "ratings"
 MOVIES_INDEX_NAME = "movies"
+GENOME_SCORE_NAME = "genome-scores"
 
 client = OpenSearch(
     hosts=[{'host': 'localhost', 'port': 9200}],
@@ -68,7 +69,7 @@ def create_tags_index(index_name):
     client.indices.create(index=index_name, body=index_body)
 
 
-@catch_error_and_log(RATINGS_INDEX_NAME)
+@catch_error_and_log(GENOME_SCORE_NAME)
 def create_ratings_index(index_name):
     index_body = {
         'settings': {
@@ -79,20 +80,26 @@ def create_ratings_index(index_name):
         },
         "mappings": {
             "properties": {
-                "@timestamp": {
-                    "type": "date"
-                },
                 "@version": {
-                    "type": "integer"
+                    "type": "text"
                 },
                 "movieId": {
                     "type": "integer"
                 },
-                "rating": {
-                    "type": "half_float"
+                "relevance": {
+                    "type": "float"
                 },
-                "userId": {
+                "tagId": {
                     "type": "integer"
+                },
+                "tag_name": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
                 }
             }
         }
@@ -147,10 +154,58 @@ def create_movies_index(index_name):
     client.indices.create(index=index_name, body=index_body)
 
 
+@catch_error_and_log(MOVIES_INDEX_NAME)
+def create_genome_score_index(index_name):
+    index_body = {
+        'settings': {
+            'index': {
+                'number_of_shards': 1,
+                "number_of_replicas": 1
+            }
+        },
+        "mappings": {
+            "properties": {
+                "@version": {
+                    "type": "text"
+                },
+                "genres": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "movieId": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "imdbId": {
+                    "type": "text"
+                },
+                "tmdbId": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+    client.indices.create(index=index_name, body=index_body)
+
+
 def main():
     create_tags_index()
     create_ratings_index()
     create_movies_index()
+    create_genome_score_index()
 
 
 if __name__ == "__main__":
