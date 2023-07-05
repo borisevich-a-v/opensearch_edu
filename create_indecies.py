@@ -1,4 +1,4 @@
-from opensearchpy import OpenSearch
+from opensearchpy import OpenSearch, RequestError
 
 TAGS_INDEX_NAME = "tags"
 RATINGS_INDEX_NAME = "ratings"
@@ -43,9 +43,6 @@ def create_tags_index():
                         }
                     }
                 },
-                "timestamp": {
-                    "type": "date"
-                },
                 "userId": {
                     "type": "integer"
                 }
@@ -79,9 +76,6 @@ def create_ratings_index():
                 "rating": {
                     "type": "half_float"
                 },
-                "timestamp": {
-                    "type": "date"
-                },
                 "userId": {
                     "type": "integer"
                 }
@@ -92,8 +86,16 @@ def create_ratings_index():
 
 
 def main():
-    create_tags_index()
-    # create_ratings_index()
+    try:
+        create_tags_index()
+        print(f"Index `{TAGS_INDEX_NAME}` for tags.csv has been created")
+    except RequestError:
+        print(f"Index name `{TAGS_INDEX_NAME}` is already in use. So index wasn't created")
+    try:
+        create_ratings_index()
+        print(f"Index `{RATINGS_INDEX_NAME}` for ratings.csv has been created")
+    except RequestError:
+        print(f"Index name `{RATINGS_INDEX_NAME}` is already in use. So index wasn't created")
 
 
 if __name__ == "__main__":
