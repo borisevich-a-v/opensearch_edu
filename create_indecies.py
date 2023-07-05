@@ -2,6 +2,7 @@ from opensearchpy import OpenSearch, RequestError
 
 TAGS_INDEX_NAME = "tags"
 RATINGS_INDEX_NAME = "ratings"
+MOVIES_INDEX_NAME = "movies"
 
 client = OpenSearch(
     hosts=[{'host': 'localhost', 'port': 9200}],
@@ -22,7 +23,9 @@ def catch_error_and_log(index_name):
                 print(f"Index `{index_name}` has been created")
             except RequestError:
                 print(f"Index name `{index_name}` is already in use. So index wasn't created")
+
         return wrapper
+
     return decorator
 
 
@@ -97,9 +100,57 @@ def create_ratings_index(index_name):
     client.indices.create(index=index_name, body=index_body)
 
 
+@catch_error_and_log(MOVIES_INDEX_NAME)
+def create_movies_index(index_name):
+    index_body = {
+        'settings': {
+            'index': {
+                'number_of_shards': 1,
+                "number_of_replicas": 1
+            }
+        },
+        "mappings": {
+            "properties": {
+                "@version": {
+                    "type": "text"
+                },
+                "genres": { # TODO list of objects
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "movieId": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "imdbId": {
+                    "type": "text"
+                },
+                "tmdbId": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+    client.indices.create(index=index_name, body=index_body)
+
+
 def main():
     create_tags_index()
     create_ratings_index()
+    create_movies_index()
 
 
 if __name__ == "__main__":
