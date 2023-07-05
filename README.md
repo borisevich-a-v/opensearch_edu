@@ -2,7 +2,7 @@ This project allows you to set up opensearch cluster locally and
 add  [this dataset](https://grouplens.org/datasets/movielens/25m/) to the cluster
 
 Difference indecies are in different stage of improvement for now. 
-The `tags` and `ratings` are in the best condition to check
+The `tags`, `ratings`, and `movies` are in the best condition to check
 
 ## How to run
 1. Run cluster with `make up-cluster`

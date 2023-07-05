@@ -1,19 +1,13 @@
-from opensearchpy import OpenSearch, RequestError
+from opensearchpy import RequestError
+
+from client import get_client
 
 TAGS_INDEX_NAME = "tags"
 RATINGS_INDEX_NAME = "ratings"
 MOVIES_INDEX_NAME = "movies"
 GENOME_SCORE_NAME = "genome-scores"
 
-client = OpenSearch(
-    hosts=[{'host': 'localhost', 'port': 9200}],
-    http_compress=True,
-    http_auth=('admin', 'admin'),
-    use_ssl=True,
-    verify_certs=False,
-    ssl_assert_hostname=False,
-    ssl_show_warn=False,
-)
+client = get_client()
 
 
 def catch_error_and_log(index_name):

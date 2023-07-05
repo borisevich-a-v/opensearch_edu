@@ -1,16 +1,8 @@
 from typing import NamedTuple
 
-from opensearchpy import OpenSearch
+from client import get_client
 
-client = OpenSearch(
-    hosts=[{'host': 'localhost', 'port': 9200}],
-    http_compress=True,
-    http_auth=('admin', 'admin'),
-    use_ssl=True,
-    verify_certs=False,
-    ssl_assert_hostname=False,
-    ssl_show_warn=False,
-)
+client = get_client()
 
 
 class Tag(NamedTuple):
@@ -23,7 +15,7 @@ def get_genome_tags():
     tag_amount = 1200
     query = {
         'size': tag_amount,
-        'query': {"match_all" : {}}
+        'query': {"match_all": {}}
     }
     response = client.search(
         body=query,
@@ -66,4 +58,3 @@ def main():
 
 
 main()
-
