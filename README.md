@@ -13,7 +13,7 @@ The `tags` is the best to check
 tags.conf -> ratings.conf -> movies.conf -> longs.conf -> genome-tags.conf -> 
 genome-score.conf
 
-   1. Change in docker-compose volumes target file
+   1. Change in docker-compose volumes path to a target file
    2. run in console ```make logstash``` 
 
 4. Denormalize dataset with `denormilize.py`

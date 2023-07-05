@@ -14,8 +14,20 @@ client = OpenSearch(
 )
 
 
-def create_tags_index():
-    name = TAGS_INDEX_NAME
+def catch_error_and_log(index_name):
+    def decorator(create_index):
+        def wrapper():
+            try:
+                create_index(index_name)
+                print(f"Index `{index_name}` has been created")
+            except RequestError:
+                print(f"Index name `{index_name}` is already in use. So index wasn't created")
+        return wrapper
+    return decorator
+
+
+@catch_error_and_log(TAGS_INDEX_NAME)
+def create_tags_index(index_name):
     index_body = {
         'settings': {
             'index': {
@@ -50,11 +62,11 @@ def create_tags_index():
         }
     }
 
-    client.indices.create(index=name, body=index_body)
+    client.indices.create(index=index_name, body=index_body)
 
 
-def create_ratings_index():
-    name = RATINGS_INDEX_NAME
+@catch_error_and_log(RATINGS_INDEX_NAME)
+def create_ratings_index(index_name):
     index_body = {
         'settings': {
             'index': {
@@ -82,20 +94,12 @@ def create_ratings_index():
             }
         }
     }
-    client.indices.create(index=name, body=index_body)
+    client.indices.create(index=index_name, body=index_body)
 
 
 def main():
-    try:
-        create_tags_index()
-        print(f"Index `{TAGS_INDEX_NAME}` for tags.csv has been created")
-    except RequestError:
-        print(f"Index name `{TAGS_INDEX_NAME}` is already in use. So index wasn't created")
-    try:
-        create_ratings_index()
-        print(f"Index `{RATINGS_INDEX_NAME}` for ratings.csv has been created")
-    except RequestError:
-        print(f"Index name `{RATINGS_INDEX_NAME}` is already in use. So index wasn't created")
+    create_tags_index()
+    create_ratings_index()
 
 
 if __name__ == "__main__":
