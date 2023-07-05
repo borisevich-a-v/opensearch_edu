@@ -1,6 +1,6 @@
 from opensearchpy import RequestError
 
-from client import get_client
+from scripts.client import get_client
 
 TAGS_INDEX_NAME = "tags"
 RATINGS_INDEX_NAME = "ratings"
